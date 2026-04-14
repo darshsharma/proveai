@@ -54,7 +54,7 @@ class MockAgent(BaseAgent):
       1. Observe on the first turn or when surroundings are unknown.
       2. If standing on the key, pick it up.
       3. If key/door location is known, navigate toward it.
-      4. Otherwise, move randomly (avoiding known walls).
+      4. Otherwise, move randomly (avoiding obstacles).
       5. Occasionally send messages to share discoveries.
     """
 
@@ -124,7 +124,7 @@ class MockAgent(BaseAgent):
             if direction:
                 return ToolCall("move", {"direction": direction})
 
-        # Random exploration: pick a non-wall direction
+        # Random exploration: pick a non-obstacle direction
         return self._random_move(r, c, state)
 
     def _parse_observation(self, obs: str, r: int, c: int) -> None:
@@ -157,13 +157,13 @@ class MockAgent(BaseAgent):
     def _direction_toward(
         self, r: int, c: int, target: tuple[int, int], state: GameState,
     ) -> str | None:
-        """Pick the best cardinal direction toward target, avoiding walls."""
+        """Pick the best cardinal direction toward target, avoiding obstacles."""
         tr, tc = target
         candidates: list[tuple[str, int]] = []
         directions = {"NORTH": (-1, 0), "SOUTH": (1, 0), "EAST": (0, 1), "WEST": (0, -1)}
         for name, (dr, dc) in directions.items():
             nr, nc = r + dr, c + dc
-            if 0 <= nr < 8 and 0 <= nc < 8 and state.grid[nr][nc] != Cell.WALL:
+            if 0 <= nr < 8 and 0 <= nc < 8 and state.grid[nr][nc] != Cell.OBSTACLE:
                 dist = abs(nr - tr) + abs(nc - tc)
                 candidates.append((name, dist))
         if candidates:
@@ -176,7 +176,7 @@ class MockAgent(BaseAgent):
         valid = []
         for name, (dr, dc) in directions.items():
             nr, nc = r + dr, c + dc
-            if 0 <= nr < 8 and 0 <= nc < 8 and state.grid[nr][nc] != Cell.WALL:
+            if 0 <= nr < 8 and 0 <= nc < 8 and state.grid[nr][nc] != Cell.OBSTACLE:
                 valid.append(name)
         if valid:
             return ToolCall("move", {"direction": self.rng.choice(valid)})

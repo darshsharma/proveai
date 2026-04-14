@@ -32,23 +32,14 @@ def infer_behavioral_state(state: GameState, agent_id: str, bus: EventBus) -> Be
         if len(unique) <= 2:
             return BehavioralState.BACKTRACKING
 
-    # COMMUNICATING: last tool was send_message
-    if agent.last_tool == "send_message":
-        return BehavioralState.COMMUNICATING
-
     # WAITING_AT_DOOR: agent is on the door cell
     r, c = agent.position
     from .state import Cell
     if state.grid[r][c] == Cell.DOOR:
         return BehavioralState.WAITING_AT_DOOR
 
-    # DELIVERING_KEY: has key and knows door location
-    if agent.has_key and agent.knows_door_location:
-        return BehavioralState.DELIVERING_KEY
-
-    # NAVIGATING_TO_KEY: knows key location, doesn't have key
+    # NAVIGATING_TO_KEY: knows key location, doesn't have key, key still on grid
     if agent.knows_key_location and not agent.has_key:
-        # Check if key still exists on the grid
         key_exists = any(
             state.grid[row][col] == Cell.KEY
             for row in range(len(state.grid))
@@ -57,7 +48,7 @@ def infer_behavioral_state(state: GameState, agent_id: str, bus: EventBus) -> Be
         if key_exists:
             return BehavioralState.NAVIGATING_TO_KEY
 
-    # NAVIGATING_TO_DOOR: knows door location (and either has key or key is collected by partner)
+    # NAVIGATING_TO_DOOR: knows door location (has key, or key already collected)
     if agent.knows_door_location:
         return BehavioralState.NAVIGATING_TO_DOOR
 
@@ -67,7 +58,12 @@ def infer_behavioral_state(state: GameState, agent_id: str, bus: EventBus) -> Be
     if recent_messages and (agent.knows_key_location or agent.knows_door_location):
         return BehavioralState.GUIDING_PARTNER
 
-    return BehavioralState.EXPLORING_BLIND
+    # EXPLORING_BLIND: no known targets, actively moving/observing
+    if agent.last_tool in ("move", "observe", None):
+        return BehavioralState.EXPLORING_BLIND
+
+    # Catch-all for any state not covered above
+    return BehavioralState.UNKNOWN
 
 
 def update_behavioral_state(state: GameState, agent_id: str, bus: EventBus) -> GameState:

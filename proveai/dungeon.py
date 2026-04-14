@@ -1,7 +1,7 @@
 """Dungeon grid generation.
 
-Produces an 8x8 grid with walls, one key, one door, and optional traps.
-Agents are placed on random empty cells.
+Produces an 8x8 grid with obstacles, one key, and one door.
+Agents are placed on random empty cells. Grid edges act as boundaries.
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ def _empty_grid() -> list[list[Cell]]:
 
 
 def _reachable(grid: list[list[Cell]], start: tuple[int, int]) -> set[tuple[int, int]]:
-    """BFS over non-wall cells from start."""
+    """BFS over passable cells (not obstacles) from start."""
     visited: set[tuple[int, int]] = set()
     q: deque[tuple[int, int]] = deque([start])
     while q:
@@ -29,14 +29,13 @@ def _reachable(grid: list[list[Cell]], start: tuple[int, int]) -> set[tuple[int,
         visited.add((r, c))
         for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
             nr, nc = r + dr, c + dc
-            if 0 <= nr < SIZE and 0 <= nc < SIZE and grid[nr][nc] != Cell.WALL and (nr, nc) not in visited:
+            if 0 <= nr < SIZE and 0 <= nc < SIZE and grid[nr][nc] != Cell.OBSTACLE and (nr, nc) not in visited:
                 q.append((nr, nc))
     return visited
 
 
 def generate_dungeon(
-    wall_density: float = 0.20,
-    num_traps: int = 2,
+    obstacle_density: float = 0.20,
     seed: int | None = None,
 ) -> GameState:
     """Generate a solvable dungeon and return the initial GameState."""
@@ -45,16 +44,16 @@ def generate_dungeon(
     for _ in range(200):  # retry until solvable
         grid = _empty_grid()
 
-        # Place walls (skip border for simplicity — inner cells only)
-        wall_count = int(SIZE * SIZE * wall_density)
+        # Place obstacles
+        obstacle_count = int(SIZE * SIZE * obstacle_density)
         all_coords = [(r, c) for r in range(SIZE) for c in range(SIZE)]
         rng.shuffle(all_coords)
-        walls_placed = 0
+        placed = 0
         for r, c in all_coords:
-            if walls_placed >= wall_count:
+            if placed >= obstacle_count:
                 break
-            grid[r][c] = Cell.WALL
-            walls_placed += 1
+            grid[r][c] = Cell.OBSTACLE
+            placed += 1
 
         # Collect remaining empty cells
         empties = [(r, c) for r in range(SIZE) for c in range(SIZE) if grid[r][c] == Cell.EMPTY]
@@ -70,18 +69,9 @@ def generate_dungeon(
         grid[key_pos[0]][key_pos[1]] = Cell.KEY
         grid[door_pos[0]][door_pos[1]] = Cell.DOOR
 
-        # Place traps on remaining empties
-        traps_placed = 0
-        for pos in empties:
-            if traps_placed >= num_traps:
-                break
-            grid[pos[0]][pos[1]] = Cell.TRAP
-            traps_placed += 1
-
         # Verify all four special positions are mutually reachable
         reachable = _reachable(grid, agent0_pos)
         if all(p in reachable for p in [agent1_pos, key_pos, door_pos]):
-            # Freeze the grid
             frozen_grid: Grid = tuple(tuple(row) for row in grid)
 
             agents = {

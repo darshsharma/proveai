@@ -77,22 +77,17 @@ def tool_move(
         new_state = state.with_agent(agent_id, last_tool="move", consecutive_drift_count=agent.consecutive_drift_count + 1)
         return ToolResult(new_state, resolution.description, False)
 
-    # Wall check
+    # Obstacle check
     target_cell = state.grid[nr][nc]
-    if target_cell == Cell.WALL:
-        resolution = ResolutionPayload(agent_id, "move", f"Agent stays at ({r},{c}) — wall at ({nr},{nc})", actual_position=(r, c), success=False, reason="WALL_BLOCKED")
+    if target_cell == Cell.OBSTACLE:
+        resolution = ResolutionPayload(agent_id, "move", f"Agent stays at ({r},{c}) — obstacle at ({nr},{nc})", actual_position=(r, c), success=False, reason="BLOCKED")
         bus.emit_tool_call(state.turn, intent, resolution)
         new_state = state.with_agent(agent_id, last_tool="move", consecutive_drift_count=agent.consecutive_drift_count + 1)
         return ToolResult(new_state, resolution.description, False)
 
-    # Trap — agent can enter but takes a penalty (loses next turn concept; for now just a warning)
-    trap_warning = ""
-    if target_cell == Cell.TRAP:
-        trap_warning = " [TRAP! Lost orientation — next observe may be unreliable.]"
-
     # Successful move
     recent = (agent.recent_positions + ((r, c),))[-5:]  # keep last 5
-    resolution = ResolutionPayload(agent_id, "move", f"Moved {direction} to ({nr},{nc}){trap_warning}", actual_position=(nr, nc), success=True)
+    resolution = ResolutionPayload(agent_id, "move", f"Moved {direction} to ({nr},{nc})", actual_position=(nr, nc), success=True)
     bus.emit_tool_call(state.turn, intent, resolution)
 
     new_state = state.with_agent(

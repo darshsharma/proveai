@@ -16,10 +16,9 @@ from typing import Any
 
 class Cell(str, Enum):
     EMPTY = "."
-    WALL = "#"
     KEY = "K"
     DOOR = "D"
-    TRAP = "T"
+    OBSTACLE = "#"
 
 
 # ---------------------------------------------------------------------------
@@ -30,12 +29,11 @@ class BehavioralState(str, Enum):
     EXPLORING_BLIND = "EXPLORING_BLIND"
     NAVIGATING_TO_KEY = "NAVIGATING_TO_KEY"
     NAVIGATING_TO_DOOR = "NAVIGATING_TO_DOOR"
-    DELIVERING_KEY = "DELIVERING_KEY"
     WAITING_AT_DOOR = "WAITING_AT_DOOR"
     GUIDING_PARTNER = "GUIDING_PARTNER"
     STUCK_RECOVERY = "STUCK_RECOVERY"
-    COMMUNICATING = "COMMUNICATING"
     BACKTRACKING = "BACKTRACKING"
+    UNKNOWN = "UNKNOWN"
 
 
 # ---------------------------------------------------------------------------

@@ -39,7 +39,7 @@ class ResolutionPayload:
     """What actually happened."""
     agent_id: str
     tool_name: str
-    description: str          # e.g. "Agent remains at (3, 4) — wall"
+    description: str          # e.g. "Agent remains at (3, 4) — obstacle"
     actual_position: tuple[int, int] | None = None
     success: bool = True
     reason: str = ""

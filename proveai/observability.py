@@ -61,7 +61,7 @@ class StepRecord:
     knows_door_location: bool
     partner_distance: int          # Manhattan to other agent
     game_turn_parity: str          # "even" / "odd" — helps spot ordering bugs
-    exploration_coverage: float    # fraction of non-wall cells visited
+    exploration_coverage: float    # fraction of passable cells visited
     timestamp_utc: str = ""
 
 
@@ -77,8 +77,9 @@ def _manhattan(a: tuple[int, int], b: tuple[int, int]) -> int:
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 
-def _count_non_walls(grid: tuple) -> int:
-    return sum(1 for row in grid for cell in row if cell.value != "#")
+def _count_passable(grid: tuple) -> int:
+    from .state import Cell
+    return sum(1 for row in grid for cell in row if cell != Cell.OBSTACLE)
 
 
 def build_step_record(
@@ -100,8 +101,8 @@ def build_step_record(
     other_agents = [a for aid, a in game_state.agents.items() if aid != agent_id]
     partner_dist = _manhattan(agent_state.position, other_agents[0].position) if other_agents else -1
 
-    non_walls = _count_non_walls(game_state.grid)
-    coverage = len(agent_state.known_positions) / non_walls if non_walls else 0.0
+    passable = _count_passable(game_state.grid)
+    coverage = len(agent_state.known_positions) / passable if passable else 0.0
 
     msg_blob = "|".join(messages) if messages else ""
     msg_hash = hashlib.md5(msg_blob.encode()).hexdigest()[:12] if msg_blob else ""

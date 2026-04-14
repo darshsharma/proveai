@@ -83,7 +83,6 @@ def run_game(
         jsonl_path = record_logger.open(run_id)
 
     state = initial_state
-    last_result_text: dict[str, str] = {aid: "" for aid in state.agents}
 
     while not state.game_over and state.turn < state.max_turns:
         agent_id = state.current_agent_id
@@ -109,13 +108,12 @@ def run_game(
                 {"sender": m.sender, "content": m.content},
             ))
 
-        # --- Build observation context (includes last tool output) ---
+        # --- Build observation context ---
         r, c = agent_state.position
         observation = (
             f"You are {agent_id} at ({r},{c}). "
             f"Has key: {agent_state.has_key}. "
-            f"Turn: {state.turn}. "
-            f"Last result: {last_result_text.get(agent_id, '')}"
+            f"Turn: {state.turn}."
         )
 
         # --- Agent decides a tool call (LLM generation span) ---
@@ -133,7 +131,6 @@ def run_game(
         tool_span = tracer.start_tool_span(turn_span, tool_call.tool_name, tool_call.tool_args)
         result = execute_tool(state, agent_id, tool_call.tool_name, tool_call.tool_args, bus)
         state = result.state
-        last_result_text[agent_id] = result.text
         tracer.end_tool_span(tool_span, {
             "success": result.success,
             "text": result.text,
