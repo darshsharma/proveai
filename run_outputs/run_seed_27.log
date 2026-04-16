@@ -1,0 +1,293 @@
+=== INITIAL DUNGEON ===
+1 . . . . . # .
+. . . . . # . .
+. . . . . . . .
+0 . . . . # . K
+D . . . . . # .
+. . . # . . # #
+. . # . . # # .
+. . . . # . # .
+
+  agent_0 starts at (3, 0)
+  agent_1 starts at (0, 0)
+  Langfuse tracing: disabled (JSONL only)
+
+  Agents: LLMAgent (Groq / qwen3-32b)
+--- Turn 0 ---
+  INTENT  [agent_0] Observing adjacent cells from (3,0)
+  RESULT  [agent_0] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: D, WEST: EDGE
+  STATE   [agent_0] EXPLORING_BLIND → NAVIGATING_TO_DOOR
+  BEHAV   [agent_0] NAVIGATING_TO_DOOR
+
+--- Turn 1 ---
+  INTENT  [agent_1] Observing adjacent cells from (0,0)
+  RESULT  [agent_1] [OK] EAST: ., HERE: ., NORTH: EDGE, SOUTH: ., WEST: EDGE
+  BEHAV   [agent_1] EXPLORING_BLIND
+
+--- Turn 2 ---
+  INTENT  [agent_0] Sending message to agent_1: 'DOOR at (4,0)'
+  RESULT  [agent_0] [OK] Message queued for agent_1
+  MSG     [agent_0] → agent_1: "DOOR at (4,0)"
+  BEHAV   [agent_0] NAVIGATING_TO_DOOR
+
+--- Turn 3 ---
+  DELIVER [agent_1] received message from agent_0
+  INTENT  [agent_1] Observing adjacent cells from (0,0)
+  RESULT  [agent_1] [OK] EAST: ., HERE: ., NORTH: EDGE, SOUTH: ., WEST: EDGE
+  BEHAV   [agent_1] EXPLORING_BLIND
+
+--- Turn 4 ---
+  INTENT  [agent_0] Observing adjacent cells from (3,0)
+  RESULT  [agent_0] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: D, WEST: EDGE
+  BEHAV   [agent_0] NAVIGATING_TO_DOOR
+
+--- Turn 5 ---
+  INTENT  [agent_1] Moving SOUTH from (0,0) to (1,0)
+  RESULT  [agent_1] [OK] Moved SOUTH to (1,0)
+  BEHAV   [agent_1] EXPLORING_BLIND
+
+--- Turn 6 ---
+  INTENT  [agent_0] Moving EAST from (3,0) to (3,1)
+  RESULT  [agent_0] [OK] Moved EAST to (3,1)
+  BEHAV   [agent_0] NAVIGATING_TO_DOOR
+
+--- Turn 7 ---
+  INTENT  [agent_1] Observing adjacent cells from (1,0)
+  RESULT  [agent_1] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: ., WEST: EDGE
+  BEHAV   [agent_1] EXPLORING_BLIND
+
+--- Turn 8 ---
+  INTENT  [agent_0] Observing adjacent cells from (3,1)
+  RESULT  [agent_0] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: ., WEST: .
+  BEHAV   [agent_0] NAVIGATING_TO_DOOR
+
+--- Turn 9 ---
+  INTENT  [agent_1] Moving EAST from (1,0) to (1,1)
+  RESULT  [agent_1] [OK] Moved EAST to (1,1)
+  BEHAV   [agent_1] EXPLORING_BLIND
+
+--- Turn 10 ---
+  INTENT  [agent_0] Moving EAST from (3,1) to (3,2)
+  RESULT  [agent_0] [OK] Moved EAST to (3,2)
+  BEHAV   [agent_0] NAVIGATING_TO_DOOR
+
+--- Turn 11 ---
+  INTENT  [agent_1] Observing adjacent cells from (1,1)
+  RESULT  [agent_1] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: ., WEST: .
+  BEHAV   [agent_1] EXPLORING_BLIND
+
+--- Turn 12 ---
+  INTENT  [agent_0] Observing adjacent cells from (3,2)
+  RESULT  [agent_0] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: ., WEST: .
+  BEHAV   [agent_0] NAVIGATING_TO_DOOR
+
+--- Turn 13 ---
+  INTENT  [agent_1] Moving EAST from (1,1) to (1,2)
+  RESULT  [agent_1] [OK] Moved EAST to (1,2)
+  BEHAV   [agent_1] EXPLORING_BLIND
+
+--- Turn 14 ---
+  INTENT  [agent_0] Moving EAST from (3,2) to (3,3)
+  RESULT  [agent_0] [OK] Moved EAST to (3,3)
+  BEHAV   [agent_0] NAVIGATING_TO_DOOR
+
+--- Turn 15 ---
+  INTENT  [agent_1] Observing adjacent cells from (1,2)
+  RESULT  [agent_1] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: ., WEST: .
+  BEHAV   [agent_1] EXPLORING_BLIND
+
+--- Turn 16 ---
+  INTENT  [agent_0] Observing adjacent cells from (3,3)
+  RESULT  [agent_0] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: ., WEST: .
+  BEHAV   [agent_0] NAVIGATING_TO_DOOR
+
+--- Turn 17 ---
+  INTENT  [agent_1] Moving NORTH from (1,2) to (0,2)
+  RESULT  [agent_1] [OK] Moved NORTH to (0,2)
+  BEHAV   [agent_1] EXPLORING_BLIND
+
+--- Turn 18 ---
+  INTENT  [agent_0] Moving EAST from (3,3) to (3,4)
+  RESULT  [agent_0] [OK] Moved EAST to (3,4)
+  BEHAV   [agent_0] NAVIGATING_TO_DOOR
+
+--- Turn 19 ---
+  INTENT  [agent_1] Observing adjacent cells from (0,2)
+  RESULT  [agent_1] [OK] EAST: ., HERE: ., NORTH: EDGE, SOUTH: ., WEST: .
+  BEHAV   [agent_1] EXPLORING_BLIND
+
+--- Turn 20 ---
+  INTENT  [agent_0] Observing adjacent cells from (3,4)
+  RESULT  [agent_0] [OK] EAST: #, HERE: ., NORTH: ., SOUTH: ., WEST: .
+  BEHAV   [agent_0] NAVIGATING_TO_DOOR
+
+--- Turn 21 ---
+  INTENT  [agent_1] Moving SOUTH from (0,2) to (1,2)
+  RESULT  [agent_1] [OK] Moved SOUTH to (1,2)
+  BEHAV   [agent_1] EXPLORING_BLIND
+
+--- Turn 22 ---
+  INTENT  [agent_0] Moving NORTH from (3,4) to (2,4)
+  RESULT  [agent_0] [OK] Moved NORTH to (2,4)
+  BEHAV   [agent_0] NAVIGATING_TO_DOOR
+
+--- Turn 23 ---
+  INTENT  [agent_1] Observing adjacent cells from (1,2)
+  RESULT  [agent_1] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: ., WEST: .
+  BEHAV   [agent_1] EXPLORING_BLIND
+
+--- Turn 24 ---
+  INTENT  [agent_0] Observing adjacent cells from (2,4)
+  RESULT  [agent_0] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: ., WEST: .
+  BEHAV   [agent_0] NAVIGATING_TO_DOOR
+
+--- Turn 25 ---
+  INTENT  [agent_1] Moving EAST from (1,2) to (1,3)
+  RESULT  [agent_1] [OK] Moved EAST to (1,3)
+  BEHAV   [agent_1] EXPLORING_BLIND
+
+--- Turn 26 ---
+  INTENT  [agent_0] Moving EAST from (2,4) to (2,5)
+  RESULT  [agent_0] [OK] Moved EAST to (2,5)
+  BEHAV   [agent_0] NAVIGATING_TO_DOOR
+
+--- Turn 27 ---
+  INTENT  [agent_1] Moving NORTH from (1,3) to (0,3)
+  RESULT  [agent_1] [OK] Moved NORTH to (0,3)
+  BEHAV   [agent_1] EXPLORING_BLIND
+
+--- Turn 28 ---
+  INTENT  [agent_0] Observing adjacent cells from (2,5)
+  RESULT  [agent_0] [OK] EAST: ., HERE: ., NORTH: #, SOUTH: #, WEST: .
+  BEHAV   [agent_0] NAVIGATING_TO_DOOR
+
+--- Turn 29 ---
+  INTENT  [agent_1] Observing adjacent cells from (0,3)
+  RESULT  [agent_1] [OK] EAST: ., HERE: ., NORTH: EDGE, SOUTH: ., WEST: .
+  BEHAV   [agent_1] EXPLORING_BLIND
+
+GAME OVER — max turns (30) reached without solving the dungeon.
+Step records written to: traces/ed31997c-5dba-4994-b44b-fa683b38799f.jsonl
+
+. . . 1 . . # .
+. . . . . # . .
+. . . . . 0 . .
+. . . . . # . K
+D . . . . . # .
+. . . # . . # #
+. . # . . # # .
+. . . . # . # .
+
+============================================================
+GAME TRACE
+============================================================
+--- Turn 0 ---
+  INTENT  [agent_0] Observing adjacent cells from (3,0)
+  RESULT  [agent_0] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: D, WEST: EDGE
+  STATE   [agent_0] EXPLORING_BLIND → NAVIGATING_TO_DOOR
+--- Turn 1 ---
+  INTENT  [agent_1] Observing adjacent cells from (0,0)
+  RESULT  [agent_1] [OK] EAST: ., HERE: ., NORTH: EDGE, SOUTH: ., WEST: EDGE
+--- Turn 2 ---
+  INTENT  [agent_0] Sending message to agent_1: 'DOOR at (4,0)'
+  RESULT  [agent_0] [OK] Message queued for agent_1
+  MSG     [agent_0] → agent_1: "DOOR at (4,0)"
+--- Turn 3 ---
+  DELIVER [agent_1] received message from agent_0
+  INTENT  [agent_1] Observing adjacent cells from (0,0)
+  RESULT  [agent_1] [OK] EAST: ., HERE: ., NORTH: EDGE, SOUTH: ., WEST: EDGE
+--- Turn 4 ---
+  INTENT  [agent_0] Observing adjacent cells from (3,0)
+  RESULT  [agent_0] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: D, WEST: EDGE
+--- Turn 5 ---
+  INTENT  [agent_1] Moving SOUTH from (0,0) to (1,0)
+  RESULT  [agent_1] [OK] Moved SOUTH to (1,0)
+--- Turn 6 ---
+  INTENT  [agent_0] Moving EAST from (3,0) to (3,1)
+  RESULT  [agent_0] [OK] Moved EAST to (3,1)
+--- Turn 7 ---
+  INTENT  [agent_1] Observing adjacent cells from (1,0)
+  RESULT  [agent_1] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: ., WEST: EDGE
+--- Turn 8 ---
+  INTENT  [agent_0] Observing adjacent cells from (3,1)
+  RESULT  [agent_0] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: ., WEST: .
+--- Turn 9 ---
+  INTENT  [agent_1] Moving EAST from (1,0) to (1,1)
+  RESULT  [agent_1] [OK] Moved EAST to (1,1)
+--- Turn 10 ---
+  INTENT  [agent_0] Moving EAST from (3,1) to (3,2)
+  RESULT  [agent_0] [OK] Moved EAST to (3,2)
+--- Turn 11 ---
+  INTENT  [agent_1] Observing adjacent cells from (1,1)
+  RESULT  [agent_1] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: ., WEST: .
+--- Turn 12 ---
+  INTENT  [agent_0] Observing adjacent cells from (3,2)
+  RESULT  [agent_0] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: ., WEST: .
+--- Turn 13 ---
+  INTENT  [agent_1] Moving EAST from (1,1) to (1,2)
+  RESULT  [agent_1] [OK] Moved EAST to (1,2)
+--- Turn 14 ---
+  INTENT  [agent_0] Moving EAST from (3,2) to (3,3)
+  RESULT  [agent_0] [OK] Moved EAST to (3,3)
+--- Turn 15 ---
+  INTENT  [agent_1] Observing adjacent cells from (1,2)
+  RESULT  [agent_1] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: ., WEST: .
+--- Turn 16 ---
+  INTENT  [agent_0] Observing adjacent cells from (3,3)
+  RESULT  [agent_0] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: ., WEST: .
+--- Turn 17 ---
+  INTENT  [agent_1] Moving NORTH from (1,2) to (0,2)
+  RESULT  [agent_1] [OK] Moved NORTH to (0,2)
+--- Turn 18 ---
+  INTENT  [agent_0] Moving EAST from (3,3) to (3,4)
+  RESULT  [agent_0] [OK] Moved EAST to (3,4)
+--- Turn 19 ---
+  INTENT  [agent_1] Observing adjacent cells from (0,2)
+  RESULT  [agent_1] [OK] EAST: ., HERE: ., NORTH: EDGE, SOUTH: ., WEST: .
+--- Turn 20 ---
+  INTENT  [agent_0] Observing adjacent cells from (3,4)
+  RESULT  [agent_0] [OK] EAST: #, HERE: ., NORTH: ., SOUTH: ., WEST: .
+--- Turn 21 ---
+  INTENT  [agent_1] Moving SOUTH from (0,2) to (1,2)
+  RESULT  [agent_1] [OK] Moved SOUTH to (1,2)
+--- Turn 22 ---
+  INTENT  [agent_0] Moving NORTH from (3,4) to (2,4)
+  RESULT  [agent_0] [OK] Moved NORTH to (2,4)
+--- Turn 23 ---
+  INTENT  [agent_1] Observing adjacent cells from (1,2)
+  RESULT  [agent_1] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: ., WEST: .
+--- Turn 24 ---
+  INTENT  [agent_0] Observing adjacent cells from (2,4)
+  RESULT  [agent_0] [OK] EAST: ., HERE: ., NORTH: ., SOUTH: ., WEST: .
+--- Turn 25 ---
+  INTENT  [agent_1] Moving EAST from (1,2) to (1,3)
+  RESULT  [agent_1] [OK] Moved EAST to (1,3)
+--- Turn 26 ---
+  INTENT  [agent_0] Moving EAST from (2,4) to (2,5)
+  RESULT  [agent_0] [OK] Moved EAST to (2,5)
+--- Turn 27 ---
+  INTENT  [agent_1] Moving NORTH from (1,3) to (0,3)
+  RESULT  [agent_1] [OK] Moved NORTH to (0,3)
+--- Turn 28 ---
+  INTENT  [agent_0] Observing adjacent cells from (2,5)
+  RESULT  [agent_0] [OK] EAST: ., HERE: ., NORTH: #, SOUTH: #, WEST: .
+--- Turn 29 ---
+  INTENT  [agent_1] Observing adjacent cells from (0,3)
+  RESULT  [agent_1] [OK] EAST: ., HERE: ., NORTH: EDGE, SOUTH: ., WEST: .
+--- Turn 30 ---
+  🏁 GAME OVER: {'result': 'LOSS', 'reason': 'Max turns reached'}
+
+============================================================
+DRIFT SUMMARY
+============================================================
+Total drifts: 0
+  agent_0: 0 drifts
+  agent_1: 0 drifts
+  system: 0 drifts
+
+============================================================
+BEHAVIORAL STATE TIMELINE
+============================================================
+  Turn   0 [agent_0] EXPLORING_BLIND → NAVIGATING_TO_DOOR
+
+RESULT: LOSS (max turns)

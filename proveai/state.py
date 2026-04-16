@@ -49,12 +49,13 @@ class AgentState:
     behavioral_state: BehavioralState = BehavioralState.EXPLORING_BLIND
     # Tracks what the agent has seen so far (cell positions it knows about)
     known_positions: frozenset[tuple[int, int]] = field(default_factory=frozenset)
-    # Whether agent knows where key/door is
-    knows_key_location: bool = False
-    knows_door_location: bool = False
     consecutive_drift_count: int = 0
     # History of recent positions for backtracking detection
     recent_positions: tuple[tuple[int, int], ...] = ()
+    # Output from the agent's last tool call, to be delivered to the agent
+    # on its NEXT turn (so observe() results arrive one turn later, like a real
+    # async call/response).
+    pending_tool_output: str | None = None
 
 
 # ---------------------------------------------------------------------------

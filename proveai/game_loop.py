@@ -20,7 +20,9 @@ from .observability import (
     TracerFacade,
     build_step_record,
     generate_run_id,
+    write_run_summary,
 )
+from .report import generate_report
 from .state import Cell, GameState
 from .tools import execute_tool
 
@@ -52,6 +54,43 @@ def check_win_condition(state: GameState) -> tuple[bool, str]:
     return False, ""
 
 
+def _extract_map_metadata(state: GameState, seed: int | None) -> dict:
+    """Build rich metadata dict from the initial game state for Langfuse."""
+    grid = state.grid
+    rows, cols = len(grid), len(grid[0])
+
+    obstacles: list[list[int]] = []
+    key_pos: list[int] | None = None
+    door_pos: list[int] | None = None
+    for r in range(rows):
+        for c in range(cols):
+            cell = grid[r][c]
+            if cell == Cell.OBSTACLE:
+                obstacles.append([r, c])
+            elif cell == Cell.KEY:
+                key_pos = [r, c]
+            elif cell == Cell.DOOR:
+                door_pos = [r, c]
+
+    # Build a compact text grid for easy reading in the dashboard.
+    grid_text = "\n".join(" ".join(cell.value for cell in row) for row in grid)
+
+    return {
+        "seed": seed,
+        "max_turns": state.max_turns,
+        "grid_rows": rows,
+        "grid_cols": cols,
+        "grid_text": grid_text,
+        "agent_0_start": list(state.agents["agent_0"].position),
+        "agent_1_start": list(state.agents["agent_1"].position),
+        "key_position": key_pos,
+        "door_position": door_pos,
+        "obstacles": obstacles,
+        "obstacle_count": len(obstacles),
+        "agent_ids": sorted(state.agents.keys()),
+    }
+
+
 def run_game(
     initial_state: GameState,
     agents: dict[str, BaseAgent],
@@ -60,6 +99,7 @@ def run_game(
     tracer: TracerFacade | None = None,
     run_id: str | None = None,
     record_logger: StepRecordLogger | None = None,
+    seed: int | None = None,
 ) -> GameState:
     """Run the game loop until win, loss, or max turns.
 
@@ -72,11 +112,7 @@ def run_game(
     if tracer is None:
         tracer = TracerFacade(enabled=False)
 
-    tracer.start_game_trace(run_id, {
-        "max_turns": initial_state.max_turns,
-        "grid_size": f"{len(initial_state.grid)}x{len(initial_state.grid[0])}",
-        "agent_ids": sorted(initial_state.agents.keys()),
-    })
+    tracer.start_game_trace(run_id, _extract_map_metadata(initial_state, seed))
 
     jsonl_path = None
     if record_logger is not None:
@@ -108,20 +144,38 @@ def run_game(
                 {"sender": m.sender, "content": m.content},
             ))
 
-        # --- Build observation context ---
+        # --- Deliver pending tool output from the agent's previous turn ---
+        prev_tool_output = agent_state.pending_tool_output
+        if prev_tool_output is not None:
+            # Consume it — agent only sees each result once.
+            state = state.with_agent(agent_id, pending_tool_output=None)
+            agent_state = state.agents[agent_id]
+
+        # --- Build observation context (physical facts only) ---
         r, c = agent_state.position
+        current_cell = state.grid[r][c]
+        at_door = current_cell == Cell.DOOR
+        on_key = current_cell == Cell.KEY
         observation = (
             f"You are {agent_id} at ({r},{c}). "
+            f"Current cell: '{current_cell.value}' "
+            f"({'DOOR' if at_door else 'KEY' if on_key else 'EMPTY'}). "
             f"Has key: {agent_state.has_key}. "
+            f"At door: {at_door}. "
             f"Turn: {state.turn}."
         )
 
         # --- Agent decides a tool call (LLM generation span) ---
-        decide_span = tracer.start_decide_span(turn_span, agent_id, {
-            "observation": observation,
-            "messages": message_texts,
-        })
-        tool_call = agent_ctrl.decide(state, observation, message_texts)
+        decide_span = tracer.start_decide_span(
+            turn_span, agent_id,
+            {
+                "observation": observation,
+                "messages": message_texts,
+                "prev_tool_output": prev_tool_output,
+            },
+            model=getattr(agent_ctrl, "model_name", "mock"),
+        )
+        tool_call = agent_ctrl.decide(state, observation, message_texts, prev_tool_output)
         tracer.end_decide_span(decide_span, {
             "tool": tool_call.tool_name,
             "args": tool_call.tool_args,
@@ -131,6 +185,9 @@ def run_game(
         tool_span = tracer.start_tool_span(turn_span, tool_call.tool_name, tool_call.tool_args)
         result = execute_tool(state, agent_id, tool_call.tool_name, tool_call.tool_args, bus)
         state = result.state
+        # Store the tool's result so it reaches the agent on its NEXT turn
+        # (async call/response semantics — observe output arrives one turn later).
+        state = state.with_agent(agent_id, pending_tool_output=result.text)
         tracer.end_tool_span(tool_span, {
             "success": result.success,
             "text": result.text,
@@ -154,6 +211,7 @@ def run_game(
             tool_call=tool_call,
             tool_result=result,
             messages=message_texts,
+            bus=bus,
         )
         tracer.log_step_record(turn_span, record)
         if record_logger is not None:
@@ -187,12 +245,47 @@ def run_game(
             print(f"GAME OVER — max turns ({state.max_turns}) reached without solving the dungeon.")
 
     tracer.log_game_over({"result": game_result, "total_turns": state.turn, "win": state.win})
-    tracer.end_game_trace({"result": game_result, "total_turns": state.turn})
+    tracer.end_game_trace({
+        "result": game_result,
+        "total_turns": state.turn,
+        "agent_0_end": list(state.agents["agent_0"].position),
+        "agent_1_end": list(state.agents["agent_1"].position),
+        "agent_0_has_key": state.agents["agent_0"].has_key,
+        "agent_1_has_key": state.agents["agent_1"].has_key,
+    })
+    tracer.score_game(state, bus)
     tracer.flush()
 
     if record_logger is not None:
         record_logger.close()
         if verbose and jsonl_path:
             print(f"Step records written to: {jsonl_path}")
+
+    # Write the cross-turn summary (always, regardless of logger config).
+    summary_path = write_run_summary(run_id, state, bus)
+    if verbose:
+        print(f"Run summary written to: {summary_path}")
+
+    # Generate the post-game report via LLM.
+    agent_model = "mock"
+    for a in agents.values():
+        if hasattr(a, "model_name") and a.model_name != "mock":
+            agent_model = a.model_name
+            break
+    try:
+        report_path = generate_report(
+            run_id=run_id,
+            seed=seed,
+            final_state=state,
+            bus=bus,
+            model_name=agent_model,
+        )
+        if verbose:
+            print(f"Post-game report written to: {report_path}")
+            print()
+            print(report_path.read_text())
+    except Exception as exc:
+        if verbose:
+            print(f"Report generation failed: {exc}")
 
     return state

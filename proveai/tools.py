@@ -117,8 +117,6 @@ def tool_observe(
     surroundings: dict[str, str] = {}
     new_known = set(agent.known_positions)
     new_known.add((r, c))
-    knows_key = agent.knows_key_location
-    knows_door = agent.knows_door_location
 
     for dir_name, (dr, dc) in DIRECTIONS.items():
         nr, nc = r + dr, c + dc
@@ -133,10 +131,6 @@ def tool_observe(
                 label += "(agent)"
             surroundings[dir_name] = label
             new_known.add((nr, nc))
-            if cell == Cell.KEY:
-                knows_key = True
-            if cell == Cell.DOOR:
-                knows_door = True
         else:
             surroundings[dir_name] = "EDGE"
 
@@ -152,8 +146,6 @@ def tool_observe(
         agent_id,
         last_tool="observe",
         known_positions=frozenset(new_known),
-        knows_key_location=knows_key,
-        knows_door_location=knows_door,
     )
     return ToolResult(new_state, f"Position ({r},{c}): {description}", True)
 
