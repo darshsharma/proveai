@@ -26,13 +26,11 @@ class Cell(str, Enum):
 # ---------------------------------------------------------------------------
 
 class BehavioralState(str, Enum):
-    EXPLORING_BLIND = "EXPLORING_BLIND"
+    WAITING_AT_DOOR = "WAITING_AT_DOOR"
     NAVIGATING_TO_KEY = "NAVIGATING_TO_KEY"
     NAVIGATING_TO_DOOR = "NAVIGATING_TO_DOOR"
-    WAITING_AT_DOOR = "WAITING_AT_DOOR"
     GUIDING_PARTNER = "GUIDING_PARTNER"
-    STUCK_RECOVERY = "STUCK_RECOVERY"
-    BACKTRACKING = "BACKTRACKING"
+    STUCK = "STUCK"
     UNKNOWN = "UNKNOWN"
 
 
@@ -46,7 +44,7 @@ class AgentState:
     position: tuple[int, int]
     has_key: bool = False
     last_tool: str | None = None
-    behavioral_state: BehavioralState = BehavioralState.EXPLORING_BLIND
+    behavioral_state: BehavioralState = BehavioralState.UNKNOWN
     # Tracks what the agent has seen so far (cell positions it knows about)
     known_positions: frozenset[tuple[int, int]] = field(default_factory=frozenset)
     consecutive_drift_count: int = 0

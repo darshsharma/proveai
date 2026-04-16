@@ -19,26 +19,25 @@ from .state import BehavioralState, GameState
 # ---------------------------------------------------------------------------
 
 def infer_behavioral_state(state: GameState, agent_id: str, bus: EventBus) -> BehavioralState:
-    """Infer the current behavioral state of an agent from game state + event history."""
+    """Infer the current behavioral state of an agent from game state + event history.
+
+    Priority order:
+      1. WAITING_AT_DOOR — standing on the door cell
+      2. GUIDING_PARTNER — sent message recently + has seen key or door
+      3. STUCK — revisiting same positions OR hitting walls repeatedly
+      4. NAVIGATING_TO_KEY — don't have key, key still on grid
+      5. NAVIGATING_TO_DOOR — has key (finding door) OR has seen door
+      6. UNKNOWN — catch-all
+    """
     agent = state.agents[agent_id]
-
-    # STUCK_RECOVERY: 3+ consecutive drifts
-    if agent.consecutive_drift_count >= 3:
-        return BehavioralState.STUCK_RECOVERY
-
-    # BACKTRACKING: agent is revisiting recent positions
-    if len(agent.recent_positions) >= 4:
-        unique = set(agent.recent_positions[-4:])
-        if len(unique) <= 2:
-            return BehavioralState.BACKTRACKING
-
-    # WAITING_AT_DOOR: agent is on the door cell
-    r, c = agent.position
     from .state import Cell
+
+    # --- WAITING_AT_DOOR: standing on the door cell ---
+    r, c = agent.position
     if state.grid[r][c] == Cell.DOOR:
         return BehavioralState.WAITING_AT_DOOR
 
-    # Scan recent observe resolutions for key/door sightings
+    # --- Scan event bus for key/door sightings ---
     has_seen_key = False
     has_seen_door = False
     for ev in bus.events_for_agent(agent_id):
@@ -47,16 +46,28 @@ def infer_behavioral_state(state: GameState, agent_id: str, bus: EventBus) -> Be
         if ev.payload.tool_name != "observe" or not ev.payload.success:
             continue
         desc = ev.payload.description
-        if f"{Cell.KEY.value}" in desc and "KEY" not in desc:
-            # description contains labels like "NORTH: K", "HERE: K"
-            pass
         if ": K" in desc or desc.startswith("K") or ", K" in desc:
             has_seen_key = True
         if ": D" in desc or desc.startswith("D") or ", D" in desc:
             has_seen_door = True
 
-    # NAVIGATING_TO_KEY: has seen key, doesn't have key, key still on grid
-    if has_seen_key and not agent.has_key:
+    # --- GUIDING_PARTNER: sent message recently + has useful info ---
+    recent_events = bus.events_for_agent(agent_id)
+    recent_messages = [e for e in recent_events[-6:] if e.event_type == EventType.MESSAGE_SENT]
+    if recent_messages and (has_seen_key or has_seen_door):
+        return BehavioralState.GUIDING_PARTNER
+
+    # --- STUCK: revisiting same 2 positions OR crashing into walls > 2 ---
+    is_looping = (
+        len(agent.recent_positions) >= 4
+        and len(set(agent.recent_positions[-4:])) <= 2
+    )
+    is_wall_stuck = agent.consecutive_drift_count > 2
+    if is_looping or is_wall_stuck:
+        return BehavioralState.STUCK
+
+    # --- NAVIGATING_TO_KEY: don't have key + key still on grid ---
+    if not agent.has_key:
         key_exists = any(
             state.grid[row][col] == Cell.KEY
             for row in range(len(state.grid))
@@ -65,21 +76,11 @@ def infer_behavioral_state(state: GameState, agent_id: str, bus: EventBus) -> Be
         if key_exists:
             return BehavioralState.NAVIGATING_TO_KEY
 
-    # NAVIGATING_TO_DOOR: has seen door
-    if has_seen_door:
+    # --- NAVIGATING_TO_DOOR: agent has key, now finding door ---
+    if agent.has_key:
         return BehavioralState.NAVIGATING_TO_DOOR
 
-    # GUIDING_PARTNER: sent a message recently while holding useful info
-    recent_events = bus.events_for_agent(agent_id)
-    recent_messages = [e for e in recent_events[-6:] if e.event_type == EventType.MESSAGE_SENT]
-    if recent_messages and (has_seen_key or has_seen_door):
-        return BehavioralState.GUIDING_PARTNER
-
-    # EXPLORING_BLIND: no known targets, actively moving/observing
-    if agent.last_tool in ("move", "observe", None):
-        return BehavioralState.EXPLORING_BLIND
-
-    # Catch-all for any state not covered above
+    # --- UNKNOWN: no pattern matched ---
     return BehavioralState.UNKNOWN
 
 

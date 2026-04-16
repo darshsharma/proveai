@@ -1,0 +1,133 @@
+[No GROQ_API_KEY — raw report data]
+
+{
+  "run_id": "83a8a9ed-c453-4843-917c-5e2f07c7137a",
+  "seed": 42,
+  "grid_rows": 8,
+  "grid_cols": 8,
+  "grid_text": ". . . . . . D #\n. # . . . . . .\nK . # # . . # #\n. # . . . . . .\n. # . . . . . .\n# . . . . # # .\n. . . . . . . .\n. . . # . . . .",
+  "agent_0_start": [
+    3,
+    7
+  ],
+  "agent_1_start": [
+    2,
+    5
+  ],
+  "key_position": [
+    2,
+    0
+  ],
+  "door_position": [
+    0,
+    6
+  ],
+  "obstacle_count": 12,
+  "result": "LOSS",
+  "total_turns": 10,
+  "max_turns": 10,
+  "scores": [
+    {
+      "name": "success",
+      "value": 0,
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "key_found",
+      "value": 0,
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "door_found",
+      "value": 0,
+      "type": "BOOLEAN"
+    },
+    {
+      "name": "agents_with_key_final",
+      "value": 0,
+      "type": "NUMERIC"
+    },
+    {
+      "name": "agents_at_door_final",
+      "value": 0,
+      "type": "NUMERIC"
+    },
+    {
+      "name": "door_found_by_n_agents",
+      "value": 0,
+      "type": "NUMERIC"
+    },
+    {
+      "name": "total_turns",
+      "value": 10,
+      "type": "NUMERIC"
+    },
+    {
+      "name": "total_drifts",
+      "value": 0,
+      "type": "NUMERIC"
+    },
+    {
+      "name": "total_messages_sent",
+      "value": 0,
+      "type": "NUMERIC"
+    }
+  ],
+  "per_agent": {
+    "agent_0": {
+      "final_position": [
+        3,
+        6
+      ],
+      "has_key_final": false,
+      "at_door_final": false,
+      "total_moves": 3,
+      "total_revisits": 0,
+      "max_visits_on_single_cell": 1,
+      "pickup_turn": null,
+      "moves_with_key": 0
+    },
+    "agent_1": {
+      "final_position": [
+        1,
+        5
+      ],
+      "has_key_final": false,
+      "at_door_final": false,
+      "total_moves": 3,
+      "total_revisits": 1,
+      "max_visits_on_single_cell": 2,
+      "pickup_turn": null,
+      "moves_with_key": 0
+    }
+  },
+  "key_info_propagation": {
+    "key_pickup_turn": null,
+    "key_pickup_by": null,
+    "partner_learned_key_turn": null,
+    "key_info_delay_turns": null
+  },
+  "door_info_propagation": {
+    "first_door_sight_turn": null,
+    "door_sighter": null,
+    "partner_learned_door_turn": null,
+    "door_info_delay_turns": null
+  },
+  "behavioral_transitions": [
+    {
+      "turn": 0,
+      "agent_id": "agent_0",
+      "from": "UNKNOWN",
+      "to": "NAVIGATING_TO_KEY"
+    },
+    {
+      "turn": 1,
+      "agent_id": "agent_1",
+      "from": "UNKNOWN",
+      "to": "NAVIGATING_TO_KEY"
+    }
+  ],
+  "drift_details": {},
+  "messages_sent": [],
+  "model_name": "mock"
+}

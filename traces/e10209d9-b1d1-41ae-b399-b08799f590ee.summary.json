@@ -1,0 +1,45 @@
+{
+  "run_id": "e10209d9-b1d1-41ae-b399-b08799f590ee",
+  "result": "LOSS",
+  "total_turns": 60,
+  "per_agent": {
+    "agent_0": {
+      "final_position": [
+        4,
+        6
+      ],
+      "has_key_final": false,
+      "at_door_final": false,
+      "total_moves": 16,
+      "total_revisits": 12,
+      "max_visits_on_single_cell": 6,
+      "pickup_turn": null,
+      "moves_with_key": 0
+    },
+    "agent_1": {
+      "final_position": [
+        1,
+        5
+      ],
+      "has_key_final": false,
+      "at_door_final": false,
+      "total_moves": 15,
+      "total_revisits": 8,
+      "max_visits_on_single_cell": 4,
+      "pickup_turn": null,
+      "moves_with_key": 0
+    }
+  },
+  "key_info_propagation": {
+    "key_pickup_turn": null,
+    "key_pickup_by": null,
+    "partner_learned_key_turn": null,
+    "key_info_delay_turns": null
+  },
+  "door_info_propagation": {
+    "first_door_sight_turn": 9,
+    "door_sighter": "agent_1",
+    "partner_learned_door_turn": null,
+    "door_info_delay_turns": null
+  }
+}
