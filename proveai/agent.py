@@ -285,9 +285,8 @@ recall past observations.
 
 Because memory is not retained, share every useful discovery with your partner
 immediately via send_message using plain text like "KEY at (3,5)" or
-"DOOR at (6,2)". The partner message you receive IS your only way to know
-about cells you haven't just observed.
-
+"DOOR at (6,2)" or "My current location is (2,3)" or "Your prev location was " or "Let's decide how to solve this" or "I will relay information so that you can find and explore." . The partner message you receive IS your only way to know about cells you haven't just observed. 
+When sending message try to keep the context of their previous messages in the context so that communication is not lost. You can try finding strategy between yourself as well to understand the current states by using the means of sending messages to each other.  
 Always respond with exactly one tool call. Do not output prose."""
 
 

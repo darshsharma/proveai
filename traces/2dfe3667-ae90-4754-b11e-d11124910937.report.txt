@@ -1,0 +1,85 @@
+Trace: 2dfe3667-ae90-4754-b11e-d11124910937
+
+Metadata
+  seed:           42
+  grid:           8 x 8
+  agent_0_start:  [3, 7]
+  agent_1_start:  [2, 5]
+  key_position:   [2, 0]
+  door_position:  [0, 6]
+  obstacles:      12 cells
+  grid:
+    . . . . . . D #
+    . # . . . . . .
+    K . # # . . # #
+    . # . . . . . .
+    . # . . . . . .
+    # . . . . # # .
+    . . . . . . . .
+    . . . # . . . .
+
+Output (end of game)
+  result:          LOSS
+  total_turns:     60
+  agent_0_end:     [3, 6]    has_key: false
+  agent_1_end:     [0, 6]    has_key: false    (at door)
+
+Scores
+  ┌───────────────┬───────────┬──────────┐
+  │ Score         │ Value     │ Type     │
+  ├───────────────┼───────────┼──────────┤
+  │ success       │ 0         │ BOOLEAN  │
+  │ key_found     │ 0         │ BOOLEAN  │
+  │ door_found    │ 1         │ BOOLEAN  │
+  │ agents_with_key_final │ 0 │ NUMERIC  │
+  │ agents_at_door_final  │ 1 │ NUMERIC  │
+  │ door_found_by_n_agents│ 1 │ NUMERIC  │
+  │ total_turns   │ 60        │ NUMERIC  │
+  │ total_drifts  │ 0         │ NUMERIC  │
+  │ total_messages_sent   │ 0 │ NUMERIC  │
+  └───────────────┴───────────┴──────────┘
+
+Per-Agent Statistics
+  agent_0: total_moves=15, total_revisits=11, max_visits_on_single_cell=6, pickup_turn=null, moves_with_key=0
+  agent_1: total_moves=15, total_revisits=9, max_visits_on_single_cell=5, pickup_turn=null, moves_with_key=0
+
+Information Propagation
+  Key:  picked up by never, partner learned on never (delay: never turns)
+  Door: first seen by agent_1 on turn 33, partner learned on never (delay: never turns)
+
+Behavioral State Timeline
+  Turn 0 [agent_0] UNKNOWN -> NAVIGATING_TO_KEY
+  Turn 1 [agent_1] UNKNOWN -> NAVIGATING_TO_KEY
+  Turn 14 [agent_0] NAVIGATING_TO_KEY -> STUCK
+  Turn 15 [agent_1] NAVIGATING_TO_KEY -> STUCK
+  Turn 23 [agent_1] STUCK -> NAVIGATING_TO_KEY
+  Turn 34 [agent_0] STUCK -> NAVIGATING_TO_KEY
+  Turn 43 [agent_1] NAVIGATING_TO_KEY -> STUCK
+  Turn 51 [agent_1] STUCK -> WAITING_AT_DOOR
+  Turn 54 [agent_0] NAVIGATING_TO_KEY -> STUCK
+  Turn 55 [agent_1] WAITING_AT_DOOR -> NAVIGATING_TO_KEY
+  Turn 58 [agent_0] STUCK -> NAVIGATING_TO_KEY
+  Turn 59 [agent_1] NAVIGATING_TO_KEY -> WAITING_AT_DOOR
+
+Drift Summary
+  Total drifts: 0
+
+Span Hierarchy
+  Trace: game-run
+  +-- Span: turn-0-agent_0
+  |    +-- Generation: decide-agent_0  (model: qwen/qwen3-32b)
+  |    +-- Span: tool-move
+  |    +-- Span: behavioral-update
+  |    +-- Event: step-record
+  +-- Span: turn-0-agent_1
+  |    +-- Generation: decide-agent_1  (model: qwen/qwen3-32b)
+  |    +-- Span: tool-move
+  |    +-- Span: behavioral-update
+  |    +-- Event: step-record
+  +-- ...
+  +-- Event: game-over
+
+Analysis
+  Agents failed to locate the key despite repeated attempts, with both agents entering STUCK states multiple times. The main bottleneck was exploration - agent_1 discovered the door but never shared this information. Agent_1 reached the door twice but lacked the key, while agent_0 became trapped in loops near its starting position. The agents' failure to coordinate pathfinding and share positional updates prevented successful key acquisition. Improved communication protocols and dynamic path adjustments based on shared discoveries would likely improve outcomes.
+
+Langfuse: https://us.cloud.langfuse.com -> project proveai -> Traces -> search 2dfe3667
